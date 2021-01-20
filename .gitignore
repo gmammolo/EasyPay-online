@@ -2,6 +2,6 @@
 target
 BankUnito.iml
 /angular-src/nbproject/private/
-
-
+node_modules
+.directory
 *.log
