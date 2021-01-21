@@ -4,8 +4,6 @@ import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 import { debounceTime, switchMap } from 'rxjs/operators';
 import {
-  Commerciante,
-  COMMERCIANTE_TYPE,
   CommercianteService,
   LoaderService,
   LoadingStatus,

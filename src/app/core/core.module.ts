@@ -4,9 +4,11 @@ import { ModuleWithProviders, NgModule } from '@angular/core';
 import { MatIconModule, MatIconRegistry } from '@angular/material/icon';
 import { DomSanitizer } from '@angular/platform-browser';
 
-import { ClienteService } from './services/cliente.service';
-import { CommercianteService } from './services/commerciante.service';
+import { UtenteService } from './services/utente.service';
+import { ContoService } from './services/conto.service';
 import { PrezzoService } from './services/pagamento.service';
+import { UtentiStore } from './stores/utenti.store';
+import { ContiStore } from './stores/conti.store';
 
 @NgModule({
   declarations: [],
@@ -25,9 +27,11 @@ export class CoreModule {
     return {
       ngModule: CoreModule,
       providers: [
-        CommercianteService,
-        ClienteService,
+        UtenteService,
         PrezzoService,
+        ContoService,
+        UtentiStore,
+        ContiStore,
       ],
     };
   }

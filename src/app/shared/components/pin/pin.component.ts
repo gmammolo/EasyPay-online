@@ -27,7 +27,7 @@ export class PinComponent implements OnInit {
   ngOnInit() {}
 
   login() {
-    this.clienteService.getClienteByPin(this.formCrl.value.userId, this.formCrl.value.pinCode).subscribe(result => {
+    this.clienteService.getUtenteByPin(this.formCrl.value.userId, this.formCrl.value.pinCode).subscribe(result => {
       if (result.type !== CUSTOM_ERROR) {
         this.pagamentoService.handlePagamento();
       }

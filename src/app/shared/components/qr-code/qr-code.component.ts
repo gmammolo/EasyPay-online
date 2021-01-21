@@ -31,7 +31,7 @@ export class QrCodeComponent implements OnInit {
   /** alla lettura dello stato prova ad effettuare il login */
   scanSuccessHandler(token: string) {
     this.scanner.enable = false;
-    this.clienteService.getClienteByToken(token).subscribe(result => {
+    this.clienteService.getUtenteByTokenOtp(token).subscribe(result => {
       if (result.type !== CUSTOM_ERROR) {
         this.pagamentoService.handlePagamento();
       } else {

@@ -1,13 +1,12 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { BehaviorSubject } from 'rxjs';
-import { ApiRequest } from 'src/app/core/models/api.request';
-import { ApiResponse } from 'src/app/core/models/api.response';
-import { ClienteService } from 'src/app/core/services/cliente.service';
-import { CommercianteService } from 'src/app/core/services/commerciante.service';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 
+import { UtenteType } from '../constants/utente-type.enum';
 import { CUSTOM_ERROR, CustomError } from '../models/error.model';
+import { UtentiStore } from '../stores/utenti.store';
 
 @Injectable({
   providedIn: 'root'
@@ -17,8 +16,7 @@ export class PrezzoService {
 
   constructor(
     private http: HttpClient,
-    private commercianteService: CommercianteService,
-    private clienteService: ClienteService,
+    private clientiStore: UtentiStore,
     private router: Router
   ) {}
   /** Salva il valore del trasferimento da effettuare */
@@ -34,39 +32,53 @@ export class PrezzoService {
   /** gestisce un pagamento una volta che gli store sono stati tutti inizializzati correttamente */
   handlePagamento() {
     this.pagamento(
-      this.commercianteService.contoCommerciante$.value.idConto,
-      this.clienteService.cliente$.value.id,
-      this.prezzo$.value
-    ).subscribe(result => {
-      const response = { timestamp: new Date().getTime() };
-      if (result.success) {
+      this.clientiStore.get(UtenteType.cliente) ? this.clientiStore.get(UtenteType.cliente).idConto : '',
+      this.clientiStore.get(UtenteType.commerciante) ? this.clientiStore.get(UtenteType.commerciante).idConto : '',
+      this.prezzo$.value // TODO: vedere che fare del prezzo
+    ).subscribe({
+      next: result => {
+        const response = { timestamp: new Date().getTime() };
         if (window.opener) {
           window.opener.postMessage(JSON.stringify({ success: true, ...response }), '*');
           setInterval(() => window.close(), 1000);
         } else {
           console.error('Impossibile chiudere pagina');
         }
-      } else {
+      },
+      error: (error: CustomError) => {
         const titleLabel = 'Impossibile procedere con il pagamento';
-        const message = 'Ricaricare il conto';
-        const error: CustomError = { type: CUSTOM_ERROR, name: result.error.id, message: result.error.message };
         window.opener.postMessage(
-          JSON.stringify({ success: false, erroCode: result.error.id, errorMessage: result.error.message, ...response }),
+          JSON.stringify({ success: false, erroCode: error.name, errorMessage: error.message }),
           '*'
         );
         setInterval(() => window.close(), 1000);
-        this.router.navigateByUrl(`/error?titleLabel=${titleLabel}&content=${message}&error=${JSON.stringify(error)}`);
+        this.router.navigateByUrl(`/error?titleLabel=${titleLabel}&content=${error.message}&error=${JSON.stringify(error)}`);
       }
     });
   }
 
-  /** effettua il pagamento e da un esito dell' operazione  */
-  pagamento(idCommerciante: string, idCliente: string, prezzo: number) {
+  pagamento(idContoCliente: string, idContoCommerciante: string, prezzo: number): Observable<boolean> {
     const params = {
-      idCommerciante,
-      idCliente,
-      prezzo, // : prezzo + ''
+      from: idContoCliente,
+      to: idContoCommerciante,
+      value: prezzo + '',
     };
-    return this.http.post<ApiResponse<{ success: boolean; error?: { id: string; message: string } }>>('/api/pagamenti', params);
+    return this.http.post('api/pagamenti', params).pipe(
+      map(result => {
+        console.error('TODO: gestire la risposta del pagamento');
+        return true;
+        // TODO: caso di saldo mancante:
+        // const message = 'Ricaricare il conto';
+        // throw { type: CUSTOM_ERROR, name: 'Saldo Insufficiente', message } as CustomError;
+      }),
+      catchError((error) => {
+        console.error('error');
+        throw {
+          type: CUSTOM_ERROR,
+          name: 'backend error',
+          message: error,
+        };
+      })
+    );
   }
 }
