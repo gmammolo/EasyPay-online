@@ -1,11 +1,8 @@
-import { CursorError } from '@angular/compiler/src/ml_parser/lexer';
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
-import { debounceTime, switchMap } from 'rxjs/operators';
-import { Commerciante, COMMERCIANTE_TYPE } from 'src/app/core/models/commerciante.model';
 
-import { CommercianteService, PrezzoService, LoaderService, LoadingStatus } from './core';
+import { LoaderService, LoadingStatus } from './core/services/loader.service';
+
 
 @Component({
   selector: 'app-root',

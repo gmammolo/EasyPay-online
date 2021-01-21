@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
+import { LoaderService, LoadingStatus } from 'src/app/core/services/loader.service';
 
 import { UtenteType } from '../constants/utente-type.enum';
 import { CUSTOM_ERROR, CustomError } from '../models/error.model';
@@ -17,7 +18,8 @@ export class PagamentoService {
   constructor(
     private http: HttpClient,
     private clientiStore: UtentiStore,
-    private router: Router
+    private router: Router,
+    private loaderService: LoaderService,
   ) {}
   /** Salva il valore del trasferimento da effettuare */
   setPrezzo(value: string) {
@@ -31,6 +33,7 @@ export class PagamentoService {
 
   /** gestisce un pagamento una volta che gli store sono stati tutti inizializzati correttamente */
   handlePagamento() {
+    this.loaderService.changeStatus(LoadingStatus.LOADING);
     this.pagamento(
       this.clientiStore.get(UtenteType.cliente) ? this.clientiStore.get(UtenteType.cliente).idConto : '',
       this.clientiStore.get(UtenteType.commerciante) ? this.clientiStore.get(UtenteType.commerciante).idConto : '',
@@ -44,8 +47,10 @@ export class PagamentoService {
         } else {
           console.error('Impossibile chiudere pagina');
         }
+        this.loaderService.changeStatus(LoadingStatus.SUCCESS);
       },
       error: (error: CustomError) => {
+        this.loaderService.changeStatus(LoadingStatus.SUCCESS);
         const titleLabel = 'Impossibile procedere con il pagamento';
         window.opener.postMessage(
           JSON.stringify({ success: false, erroCode: error.name, errorMessage: error.message }),

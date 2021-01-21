@@ -7,7 +7,7 @@
     <p class="price">{{ prezzo$ | async | currency: 'EUR':'symbol':'1.2' }}</p>
     <div>
       <p class="customer-rs">{{ (commerciante$ | async).ragSoc }}</p>
-      <p class="customer-name">{{ (commerciante$ | async).piva }}</p>
+      <p class="customer-name">{{ (commerciante$ | async).cognome }} {{ (commerciante$ | async).nome }}</p>
     </div>
 
     <div class="content">

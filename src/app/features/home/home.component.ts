@@ -56,7 +56,7 @@ export class HomeComponent implements OnInit {
         debounceTime(200),
         switchMap(params => {
           this.pagamentoService.setPrezzo(params.prezzo);
-          if (this.commerciante$.value.id) {
+          if (this.commerciante$.value && this.commerciante$.value.id) {
             return this.commerciante$;
           } else {
             return this.contoService.getConto(params.idConto).pipe(
@@ -71,6 +71,7 @@ export class HomeComponent implements OnInit {
       .subscribe({
         next:  result => {
           if (result.type === UtenteType.commerciante) {
+            this.commerciante$.next(result);
             this.loaderService.changeStatus(LoadingStatus.SUCCESS);
           }
         },
