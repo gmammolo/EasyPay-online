@@ -2,7 +2,9 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { BarcodeFormat } from '@zxing/library';
 import { ZXingScannerComponent } from '@zxing/ngx-scanner';
 import { BehaviorSubject } from 'rxjs';
-import { ClienteService, CUSTOM_ERROR, PrezzoService } from 'src/app/core';
+import { CUSTOM_ERROR } from 'src/app/core/models/error.model';
+import { PagamentoService } from 'src/app/core/services/pagamento.service';
+import { UtenteService } from 'src/app/core/services/utente.service';
 
 @Component({
   selector: 'app-qr-code',
@@ -24,14 +26,14 @@ export class QrCodeComponent implements OnInit {
   /** determina se è riuscito ad aprire o meno lo scanner */
   statusScanner$: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
-  constructor(private clienteService: ClienteService, private pagamentoService: PrezzoService) { }
+  constructor(private utenteService: UtenteService, private pagamentoService: PagamentoService) { }
 
   ngOnInit() { }
 
   /** alla lettura dello stato prova ad effettuare il login */
   scanSuccessHandler(token: string) {
     this.scanner.enable = false;
-    this.clienteService.getUtenteByTokenOtp(token).subscribe(result => {
+    this.utenteService.getUtenteByTokenOtp(token).subscribe(result => {
       if (result.type !== CUSTOM_ERROR) {
         this.pagamentoService.handlePagamento();
       } else {

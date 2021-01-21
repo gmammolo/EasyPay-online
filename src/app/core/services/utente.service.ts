@@ -34,34 +34,35 @@ export class UtenteService {
   constructor(private http: HttpClient) {
   }
 
-  getUtenteByPin(id: string, pin: string): Observable<Utente> {
+  /** restituisce una variante ridotta dell'Utente senza i dati più sensibili */
+  public getUtenteNoSecurity(id: string): Observable<Utente> {
+    if (!id) {
+      return throwError(new WrongParamError({ id }));
+    }
+    return this._getUtenteHttp(id);
+  }
+
+
+  public getUtenteByPin(id: string, pin: string): Observable<Utente> {
     if (!id || !pin) {
       return throwError(new WrongParamError({ id, pin }));
     }
-
-    return this._getClient(id, { pin });
+    return this._getUtenteHttp(id, { pin });
   }
 
-  getUtenteByTokenOtp(qrCode: string): Observable<Utente> {
+  public getUtenteByTokenOtp(qrCode: string): Observable<Utente> {
     const [id, otp] = qrCode.split('-');
     if (!id || !otp) {
       return throwError(new WrongParamError({ id, otp }));
     }
 
-    return this._getClient(id, { otp });
+    return this._getUtenteHttp(id, { otp });
   }
-
-  getSelfClient(): Observable<Utente> {
-    return this.http.get<ApiUtente>(`/api/clienti/self`).pipe(
-      map(apiUtente => this._cleanUtente(apiUtente))
-    );
-  }
-
 
   /** effettua la richiesta HTTP per verificare se il login dell'utente va a buon fine */
-  private _getClient(
+  private _getUtenteHttp(
     id: string,
-    params: { pin?: string; otp?: string }
+    params: { pin?: string; otp?: string } = {}
   ): Observable<Utente> {
     return this.http
       .get<ApiUtente>(`/api/clienti/${id}`, { params })

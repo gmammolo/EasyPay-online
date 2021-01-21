@@ -6,7 +6,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 
 import { UtenteService } from './services/utente.service';
 import { ContoService } from './services/conto.service';
-import { PrezzoService } from './services/pagamento.service';
+import { PagamentoService } from './services/pagamento.service';
 import { UtentiStore } from './stores/utenti.store';
 import { ContiStore } from './stores/conti.store';
 
@@ -28,7 +28,7 @@ export class CoreModule {
       ngModule: CoreModule,
       providers: [
         UtenteService,
-        PrezzoService,
+        PagamentoService,
         ContoService,
         UtentiStore,
         ContiStore,

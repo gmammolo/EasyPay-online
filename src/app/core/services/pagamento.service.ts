@@ -11,7 +11,7 @@ import { UtentiStore } from '../stores/utenti.store';
 @Injectable({
   providedIn: 'root'
 })
-export class PrezzoService {
+export class PagamentoService {
   prezzo$: BehaviorSubject<number> = new BehaviorSubject(0);
 
   constructor(

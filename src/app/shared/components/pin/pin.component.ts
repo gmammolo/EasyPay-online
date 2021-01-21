@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators, FormGroup } from '@angular/forms';
+import { CUSTOM_ERROR } from 'src/app/core/models/error.model';
+import { PagamentoService } from 'src/app/core/services/pagamento.service';
+import { UtenteService } from 'src/app/core/services/utente.service';
 
 import { numericValidator } from '../../directives/numeric.directive';
-import { ClienteService, PrezzoService, CUSTOM_ERROR } from '../../../core';
 
 @Component({
   selector: 'app-pin',
@@ -15,8 +17,8 @@ export class PinComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private clienteService: ClienteService,
-    private pagamentoService: PrezzoService
+    private utenteService: UtenteService,
+    private pagamentoService: PagamentoService,
   ) {
     this.formCrl = this.fb.group({
       userId: this.fb.control('', [Validators.required]),
@@ -27,7 +29,7 @@ export class PinComponent implements OnInit {
   ngOnInit() {}
 
   login() {
-    this.clienteService.getUtenteByPin(this.formCrl.value.userId, this.formCrl.value.pinCode).subscribe(result => {
+    this.utenteService.getUtenteByPin(this.formCrl.value.userId, this.formCrl.value.pinCode).subscribe(result => {
       if (result.type !== CUSTOM_ERROR) {
         this.pagamentoService.handlePagamento();
       }

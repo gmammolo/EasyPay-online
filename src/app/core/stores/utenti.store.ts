@@ -15,9 +15,13 @@ export class UtentiStore {
 
   constructor() { }
 
-  public get(utenteType: UtenteType) {
-    if (this.store[utenteType]) {
+
+  public get(id: string): Utente;
+  public get(utenteType: UtenteType, id: string = ''): Utente {
+    if (utenteType === UtenteType.cliente || utenteType === UtenteType.commerciante) {
       return this.store[utenteType];
+    } else if (id) {
+      return this.store[Object.keys(this.store).find(key => this.store[key].id === id )];
     }
   }
 

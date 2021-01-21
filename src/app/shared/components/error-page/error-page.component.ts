@@ -1,8 +1,9 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { CustomError, LoaderService, LoadingStatus } from 'src/app/core';
 import { BehaviorSubject } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { debounceTime, switchMap } from 'rxjs/operators';
+import { LoaderService, LoadingStatus } from 'src/app/core/services/loader.service';
+import { CustomError } from 'src/app/core/models/error.model';
 
 @Component({
   selector: 'app-error-page',
