@@ -9,6 +9,7 @@ import { ContoService } from './services/conto.service';
 import { PagamentoService } from './services/pagamento.service';
 import { UtentiStore } from './stores/utenti.store';
 import { ContiStore } from './stores/conti.store';
+import { httpInterceptorProviders } from './http-interceptors/auth.interceptor';
 
 @NgModule({
   declarations: [],
@@ -32,6 +33,7 @@ export class CoreModule {
         ContoService,
         UtentiStore,
         ContiStore,
+        httpInterceptorProviders,
       ],
     };
   }

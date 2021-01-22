@@ -55,12 +55,13 @@ export class HomeComponent implements OnInit {
         // debounceTime evita l'emit iniziale prima che i param siano effettivamente inizializzati
         debounceTime(200),
         switchMap(params => {
+          localStorage.setItem('token', params.token);
           this.pagamentoService.setPrezzo(params.prezzo);
           if (this.commerciante$.value && this.commerciante$.value.id) {
             return this.commerciante$;
           } else {
             return this.contoService.getConto(params.idConto).pipe(
-              concatMap(conto =>{
+              concatMap(conto => {
                 this.contiStore.add(UtenteType.commerciante, conto);
                 return this.utenteService.getUtenteNoSecurity(conto.id);
               })
