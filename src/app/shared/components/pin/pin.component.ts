@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, ValidatorFn, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { map } from 'rxjs/operators';
+import { UtenteType } from 'src/app/core/constants/utente-type.enum';
 import { PagamentoService } from 'src/app/core/services/pagamento.service';
 import { UtenteService } from 'src/app/core/services/utente.service';
+import { UtentiStore } from 'src/app/core/stores/utenti.store';
 
 import { numericValidator } from '../../directives/numeric.directive';
 
@@ -18,8 +20,8 @@ export class PinComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private utenteService: UtenteService,
+    private utentiStore: UtentiStore,
     private pagamentoService: PagamentoService,
-    private router: Router,
   ) {
     this.formCrl = this.fb.group({
       userId: this.fb.control('', [Validators.required]),
@@ -30,7 +32,9 @@ export class PinComponent implements OnInit {
   ngOnInit() {}
 
   login() {
-    this.utenteService.getUtenteByPin(this.formCrl.value.userId, this.formCrl.value.pinCode).subscribe({
+    this.utenteService.getUtenteByPin(this.formCrl.value.userId, this.formCrl.value.pinCode).pipe(
+      map(cliente => this.utentiStore.add(UtenteType.cliente, cliente)),
+    ).subscribe({
       next: () => this.pagamentoService.handlePagamento(),
       error: (err) => {
         // TODO: differenziare dal semplice errore del login per riproporre la schermata

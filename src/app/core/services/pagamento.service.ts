@@ -17,7 +17,7 @@ export class PagamentoService {
 
   constructor(
     private http: HttpClient,
-    private clientiStore: UtentiStore,
+    private utentiStore: UtentiStore,
     private router: Router,
     private loaderService: LoaderService,
   ) {}
@@ -35,8 +35,8 @@ export class PagamentoService {
   handlePagamento() {
     this.loaderService.changeStatus(LoadingStatus.LOADING);
     this.pagamento(
-      this.clientiStore.get(UtenteType.cliente) ? this.clientiStore.get(UtenteType.cliente).idConto : '',
-      this.clientiStore.get(UtenteType.commerciante) ? this.clientiStore.get(UtenteType.commerciante).idConto : '',
+      this.utentiStore.get(UtenteType.cliente) ? this.utentiStore.get(UtenteType.cliente).idConto : '',
+      this.utentiStore.get(UtenteType.commerciante) ? this.utentiStore.get(UtenteType.commerciante).idConto : '',
       this.prezzo$.value // TODO: vedere che fare del prezzo
     ).subscribe({
       next: result => {

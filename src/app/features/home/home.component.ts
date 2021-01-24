@@ -73,6 +73,7 @@ export class HomeComponent implements OnInit {
       .subscribe({
         next:  result => {
           if (result.type === UtenteType.commerciante) {
+            this.utentiStore.add(UtenteType.commerciante, result);
             this.commerciante$.next(result);
             this.loaderService.changeStatus(LoadingStatus.SUCCESS);
           } else {
