@@ -2,8 +2,9 @@ import { CursorError } from '@angular/compiler/src/ml_parser/lexer';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
-import { concatMap, debounceTime, map, switchMap } from 'rxjs/operators';
+import { concatMap, debounceTime, switchMap } from 'rxjs/operators';
 import { UtenteType } from 'src/app/core/constants/utente-type.enum';
+import { CUSTOM_ERROR } from 'src/app/core/models/error.model';
 import { Utente } from 'src/app/core/models/utente.model';
 import { ContoService } from 'src/app/core/services/conto.service';
 import { LoaderService, LoadingStatus } from 'src/app/core/services/loader.service';
@@ -74,6 +75,14 @@ export class HomeComponent implements OnInit {
           if (result.type === UtenteType.commerciante) {
             this.commerciante$.next(result);
             this.loaderService.changeStatus(LoadingStatus.SUCCESS);
+          } else {
+            // account cliente
+            this.loaderService.changeStatus(LoadingStatus.FAILED);
+            throw { 
+              type: CUSTOM_ERROR,
+              name: 'tipo account errato',
+              message: 'è necessario un account da commerciante, ma questo account è di tipo ' + result.type,
+            };
           }
         },
         error: error => {
