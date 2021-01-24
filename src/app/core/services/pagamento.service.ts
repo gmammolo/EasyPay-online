@@ -68,7 +68,7 @@ export class PagamentoService {
       to: idContoCommerciante,
       value: prezzo + '',
     };
-    return this.http.post('api/pagamenti', params).pipe(
+    return this.http.post('/api/pagamenti', params).pipe(
       map(result => {
         console.error('TODO: gestire la risposta del pagamento');
         return true;
