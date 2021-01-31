@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { LoaderService, LoadingStatus } from 'src/app/core/services/loader.service';
 
@@ -12,8 +12,10 @@ import { UtentiStore } from '../stores/utenti.store';
 @Injectable({
   providedIn: 'root'
 })
-export class PagamentoService {
+export class PagamentoService implements OnDestroy {
   prezzo$: BehaviorSubject<number> = new BehaviorSubject(0);
+
+  private subscriptions: Subscription[] = [];
 
   constructor(
     private http: HttpClient,
@@ -34,32 +36,33 @@ export class PagamentoService {
   /** gestisce un pagamento una volta che gli store sono stati tutti inizializzati correttamente */
   handlePagamento() {
     this.loaderService.changeStatus(LoadingStatus.LOADING);
-    this.pagamento(
-      this.utentiStore.get(UtenteType.cliente) ? this.utentiStore.get(UtenteType.cliente).idConto : '',
-      this.utentiStore.get(UtenteType.commerciante) ? this.utentiStore.get(UtenteType.commerciante).idConto : '',
-      this.prezzo$.value // TODO: vedere che fare del prezzo
-    ).subscribe({
-      next: result => {
-        const response = { timestamp: new Date().getTime() };
-        if (window.opener) {
-          window.opener.postMessage(JSON.stringify({ success: true, ...response }), '*');
+    this.subscriptions.push(
+      this.pagamento(
+        this.utentiStore.get(UtenteType.cliente) ? this.utentiStore.get(UtenteType.cliente).idConto : '',
+        this.utentiStore.get(UtenteType.commerciante) ? this.utentiStore.get(UtenteType.commerciante).idConto : '',
+        this.prezzo$.value // TODO: vedere che fare del prezzo
+      ).subscribe({
+        next: result => {
+          const response = { timestamp: new Date().getTime() };
+          if (window.opener) {
+            window.opener.postMessage(JSON.stringify({ success: true, ...response }), '*');
+            setInterval(() => window.close(), 1000);
+          } else {
+            console.error('Impossibile chiudere pagina');
+          }
+          this.loaderService.changeStatus(LoadingStatus.SUCCESS);
+        },
+        error: (error: CustomError) => {
+          this.loaderService.changeStatus(LoadingStatus.SUCCESS);
+          const titleLabel = 'Impossibile procedere con il pagamento';
+          window.opener.postMessage(
+            JSON.stringify({ success: false, erroCode: error.name, errorMessage: error.message }),
+            '*'
+          );
           setInterval(() => window.close(), 1000);
-        } else {
-          console.error('Impossibile chiudere pagina');
+          this.router.navigateByUrl(`/error?titleLabel=${titleLabel}&content=${error.message}&error=${JSON.stringify(error)}`);
         }
-        this.loaderService.changeStatus(LoadingStatus.SUCCESS);
-      },
-      error: (error: CustomError) => {
-        this.loaderService.changeStatus(LoadingStatus.SUCCESS);
-        const titleLabel = 'Impossibile procedere con il pagamento';
-        window.opener.postMessage(
-          JSON.stringify({ success: false, erroCode: error.name, errorMessage: error.message }),
-          '*'
-        );
-        setInterval(() => window.close(), 1000);
-        this.router.navigateByUrl(`/error?titleLabel=${titleLabel}&content=${error.message}&error=${JSON.stringify(error)}`);
-      }
-    });
+      }));
   }
 
   pagamento(idContoCliente: string, idContoCommerciante: string, prezzo: number): Observable<boolean> {
@@ -85,5 +88,9 @@ export class PagamentoService {
         };
       })
     );
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach(subsc => subsc.unsubscribe());
   }
 }

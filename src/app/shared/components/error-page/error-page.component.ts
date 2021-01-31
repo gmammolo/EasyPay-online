@@ -1,5 +1,5 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { BehaviorSubject, Subscription } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { debounceTime, switchMap } from 'rxjs/operators';
 import { LoaderService, LoadingStatus } from 'src/app/core/services/loader.service';
@@ -10,7 +10,7 @@ import { CustomError } from 'src/app/core/models/error.model';
   templateUrl: './error-page.component.html',
   styleUrls: ['./error-page.component.scss']
 })
-export class ErrorPageComponent implements OnInit {
+export class ErrorPageComponent implements OnInit, OnDestroy {
 
   /** titolo della pagina di errore */
   titleLabel$: BehaviorSubject<string>;
@@ -21,6 +21,8 @@ export class ErrorPageComponent implements OnInit {
   /** oggetto errore da stampare se presente */
   error$: BehaviorSubject<CustomError>;
 
+  private subscriptions: Subscription[] = [];
+
   constructor(private route: ActivatedRoute, private loaderService: LoaderService) {
     this.titleLabel$ = new BehaviorSubject('Impossibile procedere con il pagamento. Se il problema persiste contattare il venditore');
     this.content$ = new BehaviorSubject('SUGGERIMENTO PER IL VENDITORE: assicurarsi che il idConto e prezzo siano validi');
@@ -29,7 +31,7 @@ export class ErrorPageComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.route.queryParams
+    this.subscriptions.push(this.route.queryParams
     .pipe(
       // debounceTime evita l'emit iniziale prima che i param siano effettivamente inizializzati
       debounceTime(200),
@@ -46,6 +48,10 @@ export class ErrorPageComponent implements OnInit {
         return [];
       })
     )
-    .subscribe();
+    .subscribe());
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach(subsc => subsc.unsubscribe());
   }
 }

@@ -1,7 +1,7 @@
 import { CursorError } from '@angular/compiler/src/ml_parser/lexer';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subscription } from 'rxjs';
 import { concatMap, debounceTime, switchMap } from 'rxjs/operators';
 import { UtenteType } from 'src/app/core/constants/utente-type.enum';
 import { CUSTOM_ERROR } from 'src/app/core/models/error.model';
@@ -18,7 +18,7 @@ import { UtentiStore } from 'src/app/core/stores/utenti.store';
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, OnDestroy {
 
   readonly LoadingStatus =  LoadingStatus;
 
@@ -30,6 +30,9 @@ export class HomeComponent implements OnInit {
   prezzo$: BehaviorSubject<number>;
 
   commerciante$: BehaviorSubject<Utente>;
+
+
+  private subscriptions: Subscription[] = [];
 
   constructor(
     private route: ActivatedRoute,
@@ -51,12 +54,12 @@ export class HomeComponent implements OnInit {
     this.commerciante$ = new BehaviorSubject(this.utentiStore.get(UtenteType.commerciante));
     this.prezzo$ = this.pagamentoService.prezzo$;
 
-    this.route.queryParams
+    this.subscriptions.push(this.route.queryParams
       .pipe(
         // debounceTime evita l'emit iniziale prima che i param siano effettivamente inizializzati
         debounceTime(200),
         switchMap(params => {
-          localStorage.setItem('token', params.token);
+          localStorage.setItem('onlineToken', params.token);
           this.pagamentoService.setPrezzo(params.prezzo);
           if (this.commerciante$.value && this.commerciante$.value.id) {
             return this.commerciante$;
@@ -90,6 +93,11 @@ export class HomeComponent implements OnInit {
           this.error$.next(error);
           this.loaderService.changeStatus(LoadingStatus.FAILED);
         },
-      });
+      }));
+  }
+
+
+  ngOnDestroy() {
+    this.subscriptions.forEach(subsc => subsc.unsubscribe());
   }
 }
