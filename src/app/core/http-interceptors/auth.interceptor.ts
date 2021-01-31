@@ -17,7 +17,7 @@ export class AuthInterceptor implements HttpInterceptor {
     next: HttpHandler
   ): Observable<HttpEvent<any>> {
     const authReq = req.clone({
-      headers: req.headers.set('Authorization', localStorage.getItem('token') || '')
+      headers: req.headers.set('Authorization', localStorage.getItem('onlineToken') || '')
     });
     return next.handle(authReq)
     .pipe(
@@ -25,7 +25,7 @@ export class AuthInterceptor implements HttpInterceptor {
       map( (response: HttpResponse<any>) => {
           if ( response && response.status === 403) {
             console.error('Token di accesso scaduto, logout!');
-            localStorage.removeItem('token');
+            localStorage.removeItem('onlineToken');
             this.router.navigate([]);
           }
           return response;
