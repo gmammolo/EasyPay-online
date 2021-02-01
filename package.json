@@ -4,12 +4,12 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build --base-href /easypay-online/",
-    "build:prod": "ng build --prod --base-href /easypay-online/",
+    "build": "ng build --base-href /online/",
+    "build:prod": "ng build --prod --base-href /online/",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "backend": "npx saray --port 8081 --path mock"
+    "backend": "node ./mock/index.js"
   },
   "private": true,
   "dependencies": {
@@ -45,7 +45,6 @@
     "karma-jasmine": "~2.0.1",
     "karma-jasmine-html-reporter": "^1.5.4",
     "protractor": "^5.4.4",
-    "saray": "^1.7.4",
     "ts-node": "~7.0.0",
     "tslint": "~5.15.0",
     "typescript": "~3.8.3"

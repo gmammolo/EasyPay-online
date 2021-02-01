@@ -4,6 +4,7 @@
       <mat-form-field class="full-width">
         <input matInput placeholder="ID*" formControlName="userId" />
         <mat-error *ngIf="formCrl.controls['userId'].hasError('required')"> L'id utente è <strong>richiesto</strong> </mat-error>
+        <mat-error *ngIf="formCrl.controls['userId'].hasError('WrongBE')"> Id o Pin Sbagliati</mat-error>
       </mat-form-field>
     </div>
     <div>

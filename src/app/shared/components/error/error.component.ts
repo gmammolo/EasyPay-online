@@ -1,6 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { CustomError } from 'src/app/core';
-
+import { CustomError } from 'src/app/core/models/error.model';
 @Component({
   selector: 'app-error',
   templateUrl: './error.component.html',
