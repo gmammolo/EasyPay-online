@@ -1,5 +1,5 @@
 # EASYPAY ONLINE
-Easypay-Online è una sezione extra del progetto di EasyPay. Il suo scopo è la realizzazione di una interfaccia di pagamento online che un cliente di Easypay può inserire sul suo sito per permettere al cliente di pagare.
+Easypay-Online è una sezione extra del progetto di EasyPay. Il suo scopo è la realizzazione di una interfaccia di pagamento online che un commerciante affiliato a Easypay può inserire sul suo sito per permettere al cliente di pagare.
 
 **ATTENZIONE: Il progetto è un lavoro universitario e non ha alcuna finalità commerciale. Il progetto è un semplice prototipo dell'idea**
 
