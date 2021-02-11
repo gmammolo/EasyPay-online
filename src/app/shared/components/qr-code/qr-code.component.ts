@@ -1,12 +1,10 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, EventEmitter, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { MatSelectChange } from '@angular/material/select';
 import { BarcodeFormat } from '@zxing/library';
 import { ZXingScannerComponent } from '@zxing/ngx-scanner';
 import { BehaviorSubject, Subscription } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { UtenteType } from 'src/app/core/constants/utente-type.enum';
-import { PagamentoService } from 'src/app/core/services/pagamento.service';
+import { Utente } from 'src/app/core/models/utente.model';
 import { UtenteService } from 'src/app/core/services/utente.service';
-import { UtentiStore } from 'src/app/core/stores/utenti.store';
 
 @Component({
   selector: 'app-qr-code',
@@ -17,6 +15,8 @@ export class QrCodeComponent implements OnInit, OnDestroy {
 
   /** standard accettati dal lettore */
   readonly allowedFormats = [ BarcodeFormat.QR_CODE, BarcodeFormat.EAN_13];
+  availableDevices: MediaDeviceInfo[];
+  currentDevice: MediaDeviceInfo = null;
 
   /**
    * scanner.
@@ -25,29 +25,42 @@ export class QrCodeComponent implements OnInit, OnDestroy {
   @ViewChild(ZXingScannerComponent)
   scanner: ZXingScannerComponent;
 
+  @Output() clientAuthEvent = new EventEmitter<Utente>();
+
   /** determina se è riuscito ad aprire o meno lo scanner */
   statusScanner$: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
   private subscriptions: Subscription[] = [];
 
-  constructor(private utenteService: UtenteService, private utentiStore: UtentiStore, private pagamentoService: PagamentoService) { }
+  constructor(private utenteService: UtenteService) { }
 
   ngOnInit() { }
 
   ngOnDestroy() {
-    this.subscriptions.forEach(subsc => subsc.unsubscribe());
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
   /** alla lettura dello stato prova ad effettuare il login */
   scanSuccessHandler(token: string) {
     this.scanner.enable = false;
     this.subscriptions.push(
-      this.utenteService.getUtenteByTokenOtp(token).pipe(
-        map(cliente => this.utentiStore.add(UtenteType.cliente, cliente)),
-      ).subscribe({
-        next: () =>  this.pagamentoService.handlePagamento(),
-        error: () => this.scanner.enable = true,
-      }));
+      this.utenteService.getUtenteByTokenOtp(token).subscribe(
+        cliente => this.clientAuthEvent.emit(cliente),
+        error => this.scanner.enable = true
+      )
+    );
+  }
+
+  onCamerasFound(devices: MediaDeviceInfo[]): void {
+    this.availableDevices = devices;
+
+    if (this.availableDevices && this.availableDevices.length > 0) {
+      this.currentDevice = this.availableDevices[0];
+    }
+  }
+
+  selectDevice(change: MatSelectChange) {
+    this.currentDevice = this.availableDevices.find(dev => dev.deviceId === change.value) || null;
   }
 
   /** modifica lo stato del reader, che indica se è in funzione o ha dei problemi in esecuzione */
