@@ -40,7 +40,7 @@ export class PagamentoService implements OnDestroy {
       this.pagamento(
         this.utentiStore.get(UtenteType.cliente) ? this.utentiStore.get(UtenteType.cliente).idConto : '',
         this.utentiStore.get(UtenteType.commerciante) ? this.utentiStore.get(UtenteType.commerciante).idConto : '',
-        this.prezzo$.value // TODO: vedere che fare del prezzo
+        this.prezzo$.value
       ).subscribe({
         next: result => {
           const response = { timestamp: new Date().getTime() };
@@ -53,14 +53,15 @@ export class PagamentoService implements OnDestroy {
           this.loaderService.changeStatus(LoadingStatus.SUCCESS);
         },
         error: (error: CustomError) => {
-          this.loaderService.changeStatus(LoadingStatus.SUCCESS);
           const titleLabel = 'Impossibile procedere con il pagamento';
-          window.opener.postMessage(
-            JSON.stringify({ success: false, erroCode: error.name, errorMessage: error.message }),
-            '*'
-          );
-          setInterval(() => window.close(), 1000);
-          this.router.navigateByUrl(`/error?titleLabel=${titleLabel}&content=${error.message}&error=${JSON.stringify(error)}`);
+          if (window.opener) {
+            window.opener.postMessage(JSON.stringify({ success: false, erroCode: error.name, errorMessage: error.message }), '*');
+            setInterval(() => window.close(), 1000);
+          } else {
+            console.error('Impossibile chiudere pagina');
+          }
+          this.loaderService.changeStatus(LoadingStatus.FAILED);
+          this.router.navigate(['/error'], {queryParams: {titleLabel, content: error.name, error: JSON.stringify(error)  }});
         }
       }));
   }
@@ -73,14 +74,10 @@ export class PagamentoService implements OnDestroy {
     };
     return this.http.post('/api/pagamenti', params).pipe(
       map(result => {
-        console.error('TODO: gestire la risposta del pagamento');
         return true;
-        // TODO: caso di saldo mancante:
-        // const message = 'Ricaricare il conto';
-        // throw { type: CUSTOM_ERROR, name: 'Saldo Insufficiente', message } as CustomError;
       }),
       catchError((error) => {
-        console.error('error');
+        console.error(error);
         throw {
           type: CUSTOM_ERROR,
           name: 'backend error',

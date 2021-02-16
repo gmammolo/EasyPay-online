@@ -1,7 +1,7 @@
 module.exports = function (app) {
   const users = [
     {
-      id: 1,
+      id: 20,
       otp: '235778',
       pin: '1234',
       nome: 'Ababua',
@@ -15,11 +15,11 @@ module.exports = function (app) {
       piva: 'SHKVIYNGARCNIYHCFAIHIANHAI',
       birth_date: '23/11/1989',
       type: 'commerciante',
-      id_conto: 1,
+      id_conto: 20,
       email: 'user1@gmail.com',
     },
     {
-      id: 2,
+      id: 21,
       otp: '453422',
       pin: '1234',
       nome: 'Paolo',
@@ -30,7 +30,7 @@ module.exports = function (app) {
       createdAt: '2021-01-08T11:59:42.943+0000',
       updatedAt: '2021-01-08T11:59:42.943+0000',
       birth_date: '23/11/1983',
-      id_conto: 2,
+      id_conto: 21,
       email: 'user1@gmail.com',
       type: 'cliente',
     },
