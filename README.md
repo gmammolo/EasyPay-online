@@ -1,5 +1,5 @@
 # EASYPAY ONLINE
-Easypay-Online è una sezione extra del progetto di EasyPay. Il suo scopo è la realizzazione di una interfaccia di pagamento online che un cliente di Easypay può inserire sul suo sito per permettere al cliente di pagare.
+Easypay-Online è una sezione extra del progetto di EasyPay. Il suo scopo è la realizzazione di una interfaccia di pagamento online che un commerciante affiliato a Easypay può inserire sul suo sito per permettere al cliente di pagare.
 
 **ATTENZIONE: Il progetto è un lavoro universitario e non ha alcuna finalità commerciale. Il progetto è un semplice prototipo dell'idea**
 
@@ -83,12 +83,11 @@ Run `ng generate component component-name` to generate a new component. You can 
 
 ### Componenti Fondamentali
 
-- **module**: 
-Sono delle librerie che suddividono sia logicamente che strutturalmente le varie funzioni dell'applicazione che verrà creata
-- **component**: 
-- **directive**: 
-- **pipe**: 
-- **service**: 
+- **module**
+- **component** 
+- **directive** 
+- **pipe**
+- **service**
 
 #### module
 Sono delle librerie che suddividono sia logicamente che strutturalmente le varie funzioni dell'applicazione che verrà creata.

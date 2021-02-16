@@ -1,10 +1,9 @@
-import { CursorError } from '@angular/compiler/src/ml_parser/lexer';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject, Subscription } from 'rxjs';
 import { concatMap, debounceTime, switchMap } from 'rxjs/operators';
 import { UtenteType } from 'src/app/core/constants/utente-type.enum';
-import { CUSTOM_ERROR } from 'src/app/core/models/error.model';
+import { CustomError, CUSTOM_ERROR } from 'src/app/core/models/error.model';
 import { Utente } from 'src/app/core/models/utente.model';
 import { ContoService } from 'src/app/core/services/conto.service';
 import { LoaderService, LoadingStatus } from 'src/app/core/services/loader.service';
@@ -23,7 +22,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   readonly LoadingStatus =  LoadingStatus;
 
   /** dati sull' errore ottenuto cercando di recuperare le informazioni */
-  error$: BehaviorSubject<CursorError> = new BehaviorSubject(undefined);
+  error$: BehaviorSubject<CustomError> = new BehaviorSubject(undefined);
 
   statusLoader$: BehaviorSubject<LoadingStatus>;
 
@@ -81,12 +80,14 @@ export class HomeComponent implements OnInit, OnDestroy {
             this.loaderService.changeStatus(LoadingStatus.SUCCESS);
           } else {
             // account cliente
-            this.loaderService.changeStatus(LoadingStatus.FAILED);
-            throw { 
+            const error = {
               type: CUSTOM_ERROR,
               name: 'tipo account errato',
               message: 'è necessario un account da commerciante, ma questo account è di tipo ' + result.type,
             };
+            this.error$.next(error);
+            this.loaderService.changeStatus(LoadingStatus.FAILED);
+            throw error;
           }
         },
         error: error => {

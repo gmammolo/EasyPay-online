@@ -20,4 +20,23 @@ export class ErrorComponent implements OnInit {
   ngOnInit() {
   }
 
+  getFormattedError(): string {
+    let message = this.error?.message;
+    try {
+      message = JSON.parse(message);
+    } catch (err) { /* nessun problema: message può essere una stringa */}
+    if (typeof message === 'string') {
+      return message;
+    }
+    if ( typeof message === 'object') {
+      const unknowError = message as any;
+      if (typeof unknowError.message === 'string') {
+        return unknowError.message;
+      }
+      return JSON.stringify(unknowError);
+    }
+    return '';
+  }
+
+
 }
