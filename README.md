@@ -127,7 +127,7 @@ I service sono spesso usati per comunicare con il backend o altri servizi e mani
 ### store
 Gli store non sono uno standard  di angular ma sono dei service specializzati per immagazzinare i dati e poterli riutilizzare nell'applicazione.
 
-*nota: angular è in grado di mantenere in store i dati finché è in esecuzione la SPA (quindi è possibile muoversi al suo interno tramite il router interno senza perdere i dati ma se si esce o si ricarica i dati andranno persi. Una buona soluzione può essere salvarli in localstorage)*
+*Nota: angular è in grado di mantenere in store i dati finché è in esecuzione la SPA (quindi è possibile muoversi al suo interno tramite il router interno senza perdere i dati ma se si esce o si ricarica i dati andranno persi. Una buona soluzione può essere salvarli in localstorage)*
 
 ### Ciclo di vita del Componenti
 
